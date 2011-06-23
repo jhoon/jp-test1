@@ -15,18 +15,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class ListadoActivity extends ListActivity {
-	TextView txt;
+	
+    public static final String KEY_ROWID = "_id";
+    public static final String KEY_ICON = "icon";
+    public static final String KEY_TITLE = "titulo";
+	
 	String[] movieList;
 	String[] movieId;
+	String[] movieIcon;
 	
     /** Called when the activity is first created. */
     @Override
@@ -42,8 +49,12 @@ public class ListadoActivity extends ListActivity {
         lv.setOnItemClickListener(new OnItemClickListener() {
           public void onItemClick(AdapterView<?> parent, View view,
               int position, long id) {
-        	  //Intent myIntent = new Intent(ListadoActivity.this, ListadoActivity.class);
-              //startActivity(myIntent);
+        	  Intent myIntent = new Intent(ListadoActivity.this, DetalleActivity.class);
+        	  myIntent.putExtra(ListadoActivity.KEY_ROWID, movieId[position]);
+        	  myIntent.putExtra(ListadoActivity.KEY_TITLE, movieList[position]);
+        	  myIntent.putExtra(ListadoActivity.KEY_ICON, movieList[position]);
+        	  //toast("id: "+id+" position: "+position);
+              startActivity(myIntent);
           }
         });
     }
@@ -80,23 +91,31 @@ public class ListadoActivity extends ListActivity {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     InputStream instream = entity.getContent();
-                    JSONObject myAwway = new JSONObject(convertStreamToString(instream));
-                    JSONArray movies = myAwway.getJSONArray("movies");
+                    JSONArray movies = new JSONArray(convertStreamToString(instream));
+                    instream.close();
                     //"Found: " + movies.length() + " movies";
                     movieList = new String[movies.length()];
                     movieId = new String[movies.length()];
+                    movieIcon = new String[movies.length()];
                     for (int i = 0; i < movies.length(); i++) {
                     	JSONObject movie = movies.getJSONObject(i);
                         movieList[i] = movie.getString("title");
-                        movieId[i] = movie.getString("id"); 
+                        movieId[i] = movie.getString("id");
+                        movieIcon[i] = movie.getString("year");
                     }
-                    instream.close();
                 }
             }
         }
         catch (IOException  ex) {
+        	toast("Ocurrió un error. Inténtelo nuevamente.");
         }
         catch (JSONException ex){
+        	toast("Error en el json, inténtelo nuevamente.");
         }
+    }
+    
+    private void toast(String text){
+    	Toast.makeText(getApplicationContext(), text,
+    	          Toast.LENGTH_SHORT).show();
     }
 }
