@@ -21,101 +21,106 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class ListadoActivity extends ListActivity {
-	
-    public static final String KEY_ROWID = "_id";
-    public static final String KEY_ICON = "icon";
-    public static final String KEY_TITLE = "titulo";
-	
+
+	public static final String KEY_ROWID = "_id";
+	public static final String KEY_ICON = "icon";
+	public static final String KEY_TITLE = "titulo";
+
 	String[] movieList;
 	String[] movieId;
 	String[] movieIcon;
-	
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        connect("http://jptest.nfshost.com/testapp/exm.php");
-        
-        setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, movieList));
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-        ListView lv = getListView();
-        lv.setTextFilterEnabled(false);
-        lv.setOnItemClickListener(new OnItemClickListener() {
-          public void onItemClick(AdapterView<?> parent, View view,
-              int position, long id) {
-        	  Intent myIntent = new Intent(ListadoActivity.this, DetalleActivity.class);
-        	  myIntent.putExtra(ListadoActivity.KEY_ROWID, movieId[position]);
-        	  myIntent.putExtra(ListadoActivity.KEY_TITLE, movieList[position]);
-        	  myIntent.putExtra(ListadoActivity.KEY_ICON, movieList[position]);
-        	  //toast("id: "+id+" position: "+position);
-              startActivity(myIntent);
-          }
-        });
-    }
-    
-    private static String convertStreamToString(InputStream is) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return sb.toString();
-    }
-    
-    private void connect(String url){
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(url); 
-        HttpResponse response;
- 
-        try {
-            response = httpclient.execute(httpget);
- 
-            if(response.getStatusLine().getStatusCode() == 200){
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    InputStream instream = entity.getContent();
-                    JSONArray movies = new JSONArray(convertStreamToString(instream));
-                    instream.close();
-                    //"Found: " + movies.length() + " movies";
-                    movieList = new String[movies.length()];
-                    movieId = new String[movies.length()];
-                    movieIcon = new String[movies.length()];
-                    for (int i = 0; i < movies.length(); i++) {
-                    	JSONObject movie = movies.getJSONObject(i);
-                        movieList[i] = movie.getString("title");
-                        movieId[i] = movie.getString("id");
-                        movieIcon[i] = movie.getString("year");
-                    }
-                }
-            }
-        }
-        catch (IOException  ex) {
-        	toast("Ocurrió un error. Inténtelo nuevamente.");
-        }
-        catch (JSONException ex){
-        	toast("Error en el json, inténtelo nuevamente.");
-        }
-    }
-    
-    private void toast(String text){
-    	Toast.makeText(getApplicationContext(), text,
-    	          Toast.LENGTH_SHORT).show();
-    }
+		JSONArray movies = connect("http://jptest.nfshost.com/testapp/exm.php");
+		try {
+			// "Found: " + movies.length() + " movies";
+			movieList = new String[movies.length()];
+			movieId = new String[movies.length()];
+			movieIcon = new String[movies.length()];
+			for (int i = 0; i < movies.length(); i++) {
+				JSONObject movie;
+				movie = movies.getJSONObject(i);
+				movieList[i] = movie.getString("title");
+				movieId[i] = movie.getString("id");
+				movieIcon[i] = movie.getString("year");
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item,
+				movieList));
+
+		ListView lv = getListView();
+		lv.setTextFilterEnabled(false);
+		lv.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Intent myIntent = new Intent(ListadoActivity.this,
+						DetalleActivity.class);
+				myIntent.putExtra(ListadoActivity.KEY_ROWID, movieId[position]);
+				myIntent.putExtra(ListadoActivity.KEY_TITLE,
+						movieList[position]);
+				myIntent
+						.putExtra(ListadoActivity.KEY_ICON, movieList[position]);
+				// toast("id: "+id+" position: "+position);
+				startActivity(myIntent);
+			}
+		});
+	}
+
+	private static String convertStreamToString(InputStream is) {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder sb = new StringBuilder();
+		String line = null;
+		try {
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return sb.toString();
+	}
+
+	protected static JSONArray connect(String url) {
+		HttpClient httpclient = new DefaultHttpClient();
+		HttpGet httpget = new HttpGet(url);
+		HttpResponse response;
+		JSONArray arResp = null;
+		try {
+			response = httpclient.execute(httpget);
+
+			if (response.getStatusLine().getStatusCode() == 200) {
+				HttpEntity entity = response.getEntity();
+				if (entity != null) {
+					InputStream instream = entity.getContent();
+					arResp = new JSONArray(convertStreamToString(instream));
+					instream.close();
+				}
+			}
+		} catch (Exception ex) {
+
+		}
+		return arResp;
+	}
+
+	private void toast(String text) {
+		Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT)
+				.show();
+	}
 }
