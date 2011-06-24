@@ -12,4 +12,5 @@
     <string name="cast">Actores</string>
     <string name="premiere_date">Fecha de Estreno</string>
     <string name="running_time">Duración</string>
+    <string name="detail_title">Detalle de la película</string>
 </resources>
