@@ -1,9 +1,13 @@
 package com.jp.test;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -16,6 +20,8 @@ import org.json.JSONObject;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -72,7 +78,7 @@ public class ListadoActivity extends ListActivity {
 				myIntent.putExtra(ListadoActivity.KEY_TITLE,
 						movieList[position]);
 				myIntent
-						.putExtra(ListadoActivity.KEY_ICON, movieList[position]);
+						.putExtra(ListadoActivity.KEY_ICON, movieIcon[position]);
 				// toast("id: "+id+" position: "+position);
 				startActivity(myIntent);
 

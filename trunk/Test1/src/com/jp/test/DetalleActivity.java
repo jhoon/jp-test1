@@ -1,9 +1,16 @@
 package com.jp.test;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,14 +25,18 @@ public class DetalleActivity extends Activity {
         setTitle(R.string.detail_title);
         
         String strPelicula = "";
+        String strImgUrl = "";
         Bundle extras = getIntent().getExtras();
         mRowId = "";
         if (extras != null) {
             mRowId = extras.getString(ListadoActivity.KEY_ROWID);
-            strPelicula= extras.getString(ListadoActivity.KEY_TITLE);
+            strPelicula = extras.getString(ListadoActivity.KEY_TITLE);
+            strImgUrl = extras.getString(ListadoActivity.KEY_ICON);
         }
         try{
-			JSONObject jsonPelicula = ListadoActivity.connect(DetalleActivity.url.replace("$", mRowId)).getJSONObject(0);
+        	ImageView iv = (ImageView)findViewById(R.id.imgPelicula);
+        	
+        	JSONObject jsonPelicula = ListadoActivity.connect(DetalleActivity.url.replace("$", mRowId)).getJSONObject(0);
 			TextView content;
 			content = (TextView)findViewById(R.id.txtTitle);
 			content.setText(strPelicula);
@@ -41,9 +52,17 @@ public class DetalleActivity extends Activity {
 			content.setText(jsonPelicula.getString("fecha-estreno"));
 			content = (TextView)findViewById(R.id.txtRunningTime);
 			content.setText(jsonPelicula.getString("duracion"));
+			
+			URL ulrn = new URL(strImgUrl);
+    	    HttpURLConnection con = (HttpURLConnection)ulrn.openConnection();
+    	    InputStream is = con.getInputStream();
+    	    Bitmap bmp = BitmapFactory.decodeStream(is);
+    	    if (null != bmp)
+    	        iv.setImageBitmap(bmp);
+    	    else
+    			Toast.makeText(getApplicationContext(), "Error de imagen!", Toast.LENGTH_SHORT);
 		}catch(Exception e){
 			Toast.makeText(getApplicationContext(), "Error!", Toast.LENGTH_SHORT);
 		}
 	}
-
 }
