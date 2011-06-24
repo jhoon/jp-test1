@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class ListadoActivity extends ListActivity {
@@ -29,7 +28,9 @@ public class ListadoActivity extends ListActivity {
 	public static final String KEY_ROWID = "_id";
 	public static final String KEY_ICON = "icon";
 	public static final String KEY_TITLE = "titulo";
-
+	private static final String url = "http://restmocker.bitzeppelin.com/api/datatest/peliculas.json";
+	
+	
 	String[] movieList;
 	String[] movieId;
 	String[] movieIcon;
@@ -39,7 +40,8 @@ public class ListadoActivity extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		JSONArray movies = connect("http://jptest.nfshost.com/testapp/exm.php");
+		JSONArray movies = connect(ListadoActivity.url);
+		
 		try {
 			// "Found: " + movies.length() + " movies";
 			movieList = new String[movies.length()];
@@ -48,9 +50,9 @@ public class ListadoActivity extends ListActivity {
 			for (int i = 0; i < movies.length(); i++) {
 				JSONObject movie;
 				movie = movies.getJSONObject(i);
-				movieList[i] = movie.getString("title");
 				movieId[i] = movie.getString("id");
-				movieIcon[i] = movie.getString("year");
+				movieList[i] = movie.getString("nombre");
+				movieIcon[i] = movie.getString("icono");
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -73,6 +75,7 @@ public class ListadoActivity extends ListActivity {
 						.putExtra(ListadoActivity.KEY_ICON, movieList[position]);
 				// toast("id: "+id+" position: "+position);
 				startActivity(myIntent);
+
 			}
 		});
 	}
@@ -117,10 +120,5 @@ public class ListadoActivity extends ListActivity {
 
 		}
 		return arResp;
-	}
-
-	private void toast(String text) {
-		Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT)
-				.show();
 	}
 }
