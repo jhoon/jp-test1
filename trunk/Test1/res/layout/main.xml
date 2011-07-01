@@ -4,9 +4,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+	<ListView android:id="@+id/list_movies"
+    	android:contentDescription="@string/description_mainlist"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"/>
 </LinearLayout>

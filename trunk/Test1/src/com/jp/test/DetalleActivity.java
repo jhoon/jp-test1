@@ -1,14 +1,9 @@
 package com.jp.test;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -53,14 +48,13 @@ public class DetalleActivity extends Activity {
 			content = (TextView)findViewById(R.id.txtRunningTime);
 			content.setText(jsonPelicula.getString("duracion"));
 			
-			URL ulrn = new URL(strImgUrl);
-    	    HttpURLConnection con = (HttpURLConnection)ulrn.openConnection();
-    	    InputStream is = con.getInputStream();
-    	    Bitmap bmp = BitmapFactory.decodeStream(is);
-    	    if (null != bmp)
-    	        iv.setImageBitmap(bmp);
-    	    else
-    			Toast.makeText(getApplicationContext(), "Error de imagen!", Toast.LENGTH_SHORT);
+			Bitmap bmp = ListadoActivity.getBitmapFromUrl(strImgUrl);
+			
+		    if (null != bmp)
+		        iv.setImageBitmap(bmp);
+		    else
+				Toast.makeText(getApplicationContext(), "Error de imagen!", Toast.LENGTH_SHORT);
+    	    
 		}catch(Exception e){
 			Toast.makeText(getApplicationContext(), "Error!", Toast.LENGTH_SHORT);
 		}

@@ -1,12 +1,10 @@
 package com.jp.test;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.apache.http.HttpEntity;
@@ -64,21 +62,18 @@ public class ListadoActivity extends ListActivity {
 			e.printStackTrace();
 		}
 
-		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item,
-				movieList));
+		setListAdapter(new ListadoAdapter(this));
 
 		ListView lv = getListView();
-		lv.setTextFilterEnabled(false);
+		/*		lv.setTextFilterEnabled(false);*/
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				Intent myIntent = new Intent(ListadoActivity.this,
 						DetalleActivity.class);
 				myIntent.putExtra(ListadoActivity.KEY_ROWID, movieId[position]);
-				myIntent.putExtra(ListadoActivity.KEY_TITLE,
-						movieList[position]);
-				myIntent
-						.putExtra(ListadoActivity.KEY_ICON, movieIcon[position]);
+				myIntent.putExtra(ListadoActivity.KEY_TITLE,movieList[position]);
+				myIntent.putExtra(ListadoActivity.KEY_ICON, movieIcon[position]);
 				// toast("id: "+id+" position: "+position);
 				startActivity(myIntent);
 
@@ -126,5 +121,12 @@ public class ListadoActivity extends ListActivity {
 
 		}
 		return arResp;
+	}
+	
+	public static Bitmap getBitmapFromUrl(String url) throws Exception{
+		URL ulrn = new URL(url);
+	    HttpURLConnection con = (HttpURLConnection)ulrn.openConnection();
+	    InputStream is = con.getInputStream();
+		return BitmapFactory.decodeStream(is);
 	}
 }
