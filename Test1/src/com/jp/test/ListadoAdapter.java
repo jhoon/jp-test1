@@ -1,6 +1,8 @@
 package com.jp.test;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +26,7 @@ public class ListadoAdapter extends BaseAdapter {
 	}
 	
 	public int getCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return mIds.length;
 	}
 
 	public Object getItem(int arg0) { return null; }
@@ -35,13 +36,10 @@ public class ListadoAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		View v = convertView;
-		if(v==null)
-		{
-			if(mLayoutInflater==null) 
-			{
+		if(v==null){
+			if(mLayoutInflater==null) {
 				mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			}
-			
 			v = mLayoutInflater.inflate(R.layout.list_item, null);
 		}
 		
@@ -62,5 +60,21 @@ public class ListadoAdapter extends BaseAdapter {
 
 		return v;
 	}
+/*
+	// AsyncTask <Params, Progress, Result>
+	private class DownloadImageTask extends AsyncTask<String, Void, Integer> {
+	     protected Integer doInBackground(String... strBitmapUrl){
+	         try {
+				ListadoActivity.getBitmapFromUrl(strBitmapUrl[0]);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	         return 0;
+	     }
+
+	     protected void onPostExecute(Integer result) {
+	         //mImageView.setImageBitmap(result);
+	     }
+	 }*/
 
 }

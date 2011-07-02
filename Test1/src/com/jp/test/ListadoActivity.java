@@ -16,18 +16,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.ListActivity;
+import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class ListadoActivity extends ListActivity {
+public class ListadoActivity extends Activity {
 
 	public static final String KEY_ROWID = "_id";
 	public static final String KEY_ICON = "icon";
@@ -38,13 +40,17 @@ public class ListadoActivity extends ListActivity {
 	String[] movieList;
 	String[] movieId;
 	String[] movieIcon;
-
+	JSONArray movies;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		//showDialog(0);
+		
 		JSONArray movies = connect(ListadoActivity.url);
+		//new DownloadJSONTask().execute(ListadoActivity.url);
 		
 		try {
 			// "Found: " + movies.length() + " movies";
@@ -61,11 +67,11 @@ public class ListadoActivity extends ListActivity {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
-		setListAdapter(new ListadoAdapter(this));
-
-		ListView lv = getListView();
-		/*		lv.setTextFilterEnabled(false);*/
+		setContentView(R.layout.main);
+		
+		ListView lv = (ListView)findViewById(R.id.list_movies);
+		lv.setAdapter(new ListadoAdapter(this));
+		
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
@@ -129,4 +135,38 @@ public class ListadoActivity extends ListActivity {
 	    InputStream is = con.getInputStream();
 		return BitmapFactory.decodeStream(is);
 	}
+	
+	// AsyncTask <Params, Progress, Result>
+	private class PopulateGUITask extends AsyncTask<Void, Void, Void> {
+	     protected Void doInBackground(Void... unused){
+
+			return null;
+	     }
+
+	     protected void onPostExecute(Void unused) {
+	         //movies = result;//mImageView.setImageBitmap(result);
+	     }
+	 }
+	
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case 0: {
+                ProgressDialog dialog = new ProgressDialog(null);
+                dialog.setTitle("Indeterminate");
+                dialog.setMessage("Please wait while loading...");
+                dialog.setIndeterminate(true);
+                dialog.setCancelable(true);
+                return dialog;
+            }
+            case 1: {
+                ProgressDialog dialog = new ProgressDialog(this);
+                dialog.setMessage("Please wait while loading...");
+                dialog.setIndeterminate(true);
+                dialog.setCancelable(true);
+                return dialog;
+            }
+        }
+        return null;
+    }
 }
