@@ -5,6 +5,13 @@
     android:layout_height="fill_parent"
     >
     <include layout="@layout/header"/>
+    <TextView 
+	    android:id="@+id/txtErrMsg" 
+	    android:layout_height="wrap_content" 
+	    android:layout_width="fill_parent" 
+	    android:textAppearance="?android:attr/textAppearanceLarge" 
+	    android:text=""
+    	></TextView>
 	<ListView android:id="@+id/list_movies"
     	android:contentDescription="@string/description_mainlist"
 	    android:layout_width="fill_parent"
