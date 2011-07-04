@@ -45,36 +45,37 @@ public class ListadoAdapter extends BaseAdapter {
 		
 		TextView t = (TextView) v.findViewById(R.id.txtListTitle);
 		t.setText(mTitles[position]);
+
+		ImageView imgImagen = (ImageView) v.findViewById(R.id.imgListPelicula);
+		imgImagen.setTag(mIcons[position]);
 		
-		ImageView i = (ImageView) v.findViewById(R.id.imgListPelicula);
-		
-		try {
-			i.setImageBitmap(ListadoActivity.getBitmapFromUrl(mIcons[position]));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		new ListadoAdapterTask().execute(imgImagen);
 		
 		//for accessibility
 		v.setContentDescription(mTitles[position]);
 
 		return v;
 	}
-/*
-	// AsyncTask <Params, Progress, Result>
-	private class DownloadImageTask extends AsyncTask<String, Void, Integer> {
-	     protected Integer doInBackground(String... strBitmapUrl){
-	         try {
-				ListadoActivity.getBitmapFromUrl(strBitmapUrl[0]);
+
+	private class ListadoAdapterTask extends AsyncTask<ImageView, Void, Bitmap>{
+		ImageView imgAid = null;
+		
+		protected Bitmap doInBackground(ImageView... imgView){
+			this.imgAid = imgView[0];
+			Bitmap image = null;
+			try {
+				image = ListadoActivity.getBitmapFromUrl((String)imgAid.getTag());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	         return 0;
-	     }
-
-	     protected void onPostExecute(Integer result) {
-	         //mImageView.setImageBitmap(result);
-	     }
-	 }*/
-
+			return image;
+		}
+		
+		protected void onPostExecute(Bitmap image){
+			if(image != null){
+				imgAid.setImageBitmap(image);
+			}
+		}
+		
+	}
 }

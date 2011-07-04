@@ -42,57 +42,14 @@ public class ListadoActivity extends Activity {
 	String[] movieId;
 	String[] movieIcon;
 	JSONArray movies;
+	TextView txtErrorMsg;
 	
-	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		//showDialog(0);
-		
-		JSONArray movies = connect("chaaaaan");
-		//new DownloadJSONTask().execute(ListadoActivity.url);
-		
 		setContentView(R.layout.main);
-
-		TextView txtErrorMsg = (TextView)findViewById(R.id.txtErrMsg);
-		if(movies != null){
-			txtErrorMsg.setHeight(0);
-			try {
-				// "Found: " + movies.length() + " movies";
-				movieList = new String[movies.length()];
-				movieId = new String[movies.length()];
-				movieIcon = new String[movies.length()];
-				for (int i = 0; i < movies.length(); i++) {
-					JSONObject movie;
-					movie = movies.getJSONObject(i);
-					movieId[i] = movie.getString("id");
-					movieList[i] = movie.getString("nombre");
-					movieIcon[i] = movie.getString("icono");
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			
-			ListView lv = (ListView)findViewById(R.id.list_movies);
-			lv.setAdapter(new ListadoAdapter(this));
-			
-			lv.setOnItemClickListener(new OnItemClickListener() {
-				public void onItemClick(AdapterView<?> parent, View view,
-						int position, long id) {
-					Intent myIntent = new Intent(ListadoActivity.this,
-							DetalleActivity.class);
-					myIntent.putExtra(ListadoActivity.KEY_ROWID, movieId[position]);
-					myIntent.putExtra(ListadoActivity.KEY_TITLE,movieList[position]);
-					myIntent.putExtra(ListadoActivity.KEY_ICON, movieIcon[position]);
-					// toast("id: "+id+" position: "+position);
-					startActivity(myIntent);
-
-				}
-			});
-		} else {
-			txtErrorMsg.setText("Ha ocurrido un error en la conexión");
-		}
+		new PopulateGUITask().execute();
+		
 	}
 
 	private static String convertStreamToString(InputStream is) {
@@ -146,35 +103,53 @@ public class ListadoActivity extends Activity {
 	
 	// AsyncTask <Params, Progress, Result>
 	private class PopulateGUITask extends AsyncTask<Void, Void, Void> {
-	     protected Void doInBackground(Void... unused){
-
+		protected Void doInBackground(Void... unused){
+			movies = connect(ListadoActivity.url);
 			return null;
-	     }
-
-	     protected void onPostExecute(Void unused) {
-	         //movies = result;//mImageView.setImageBitmap(result);
-	     }
-	 }
+		}
 	
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case 0: {
-                ProgressDialog dialog = new ProgressDialog(null);
-                dialog.setTitle("Indeterminate");
-                dialog.setMessage("Please wait while loading...");
-                dialog.setIndeterminate(true);
-                dialog.setCancelable(true);
-                return dialog;
-            }
-            case 1: {
-                ProgressDialog dialog = new ProgressDialog(this);
-                dialog.setMessage("Please wait while loading...");
-                dialog.setIndeterminate(true);
-                dialog.setCancelable(true);
-                return dialog;
-            }
-        }
-        return null;
-    }
+		protected void onPreExecute(){
+			txtErrorMsg = (TextView)findViewById(R.id.txtErrMsg);
+			txtErrorMsg.setText("Cargando...");
+		}
+		
+		protected void onPostExecute(Void unused) {
+			if(movies!=null){
+				txtErrorMsg.setHeight(0);
+				try {
+					// "Found: " + movies.length() + " movies";
+					movieList = new String[movies.length()];
+					movieId = new String[movies.length()];
+					movieIcon = new String[movies.length()];
+					for (int i = 0; i < movies.length(); i++) {
+						JSONObject movie;
+						movie = movies.getJSONObject(i);
+						movieId[i] = movie.getString("id");
+						movieList[i] = movie.getString("nombre");
+						movieIcon[i] = movie.getString("icono");
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				
+				ListView lv = (ListView)findViewById(R.id.list_movies);
+				lv.setAdapter(new ListadoAdapter(ListadoActivity.this));
+				
+				lv.setOnItemClickListener(new OnItemClickListener() {
+					public void onItemClick(AdapterView<?> parent, View view,
+							int position, long id) {
+						Intent myIntent = new Intent(ListadoActivity.this,
+								DetalleActivity.class);
+						myIntent.putExtra(ListadoActivity.KEY_ROWID, movieId[position]);
+						myIntent.putExtra(ListadoActivity.KEY_TITLE,movieList[position]);
+						myIntent.putExtra(ListadoActivity.KEY_ICON, movieIcon[position]);
+						startActivity(myIntent);
+
+					}
+				});	
+			} else {
+				txtErrorMsg.setText("Ha ocurrido un error en la conexión");
+			}
+		}
+	}
 }
