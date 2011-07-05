@@ -22,9 +22,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,6 +38,7 @@ public class ListadoActivity extends Activity {
 	public static final String KEY_ROWID = "_id";
 	public static final String KEY_ICON = "icon";
 	public static final String KEY_TITLE = "titulo";
+	public static final String KEY_BITMAP = "bitmap";
 	private static final String url = "http://restmocker.bitzeppelin.com/api/datatest/peliculas.json";
 	
 	
@@ -101,6 +104,10 @@ public class ListadoActivity extends Activity {
 		return BitmapFactory.decodeStream(is);
 	}
 	
+	public void makeToast(String message){
+		Toast.makeText(this.getApplicationContext(), message, Toast.LENGTH_LONG);
+	}
+	
 	// AsyncTask <Params, Progress, Result>
 	private class PopulateGUITask extends AsyncTask<Void, Void, Void> {
 		protected Void doInBackground(Void... unused){
@@ -138,16 +145,20 @@ public class ListadoActivity extends Activity {
 				lv.setOnItemClickListener(new OnItemClickListener() {
 					public void onItemClick(AdapterView<?> parent, View view,
 							int position, long id) {
+//						makeToast("width: "+view.getWidth());
+//						Log.v("Listado", "width: "+view.getWidth());
+//						ImageView imgListPelicula = (ImageView)view.findViewById(R.id.imgListPelicula);
+//						Log.v("Listado", "chan!!!! : "+imgListPelicula.getId());
 						Intent myIntent = new Intent(ListadoActivity.this,DetalleActivity.class);
 						myIntent.putExtra(ListadoActivity.KEY_ROWID, movieId[position]);
 						myIntent.putExtra(ListadoActivity.KEY_TITLE,movieList[position]);
 						myIntent.putExtra(ListadoActivity.KEY_ICON, movieIcon[position]);
+//						myIntent.putExtra(ListadoActivity.KEY_BITMAP, imgListPelicula.getDrawingCache());
 						startActivity(myIntent);
-
 					}
 				});	
 			} else {
-				Toast.makeText(null,"Ha ocurrido un error en la conexión", Toast.LENGTH_LONG);
+				makeToast("Ha ocurrido un error en la conexión");
 			}
 		}
 	}
