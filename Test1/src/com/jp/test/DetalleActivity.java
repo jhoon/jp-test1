@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,15 +23,20 @@ public class DetalleActivity extends Activity {
         String strPelicula = "";
         String strImgUrl = "";
         Bundle extras = getIntent().getExtras();
+        Bitmap bmpMovie = null;
         mRowId = "";
         if (extras != null) {
             mRowId = extras.getString(ListadoActivity.KEY_ROWID);
             strPelicula = extras.getString(ListadoActivity.KEY_TITLE);
             strImgUrl = extras.getString(ListadoActivity.KEY_ICON);
+            bmpMovie = (Bitmap)extras.get(ListadoActivity.KEY_BITMAP);
         }
+        
+        
         try{
+        	new DetalleTask().execute();
         	ImageView iv = (ImageView)findViewById(R.id.imgPelicula);
-        	
+        	iv.setImageBitmap(bmpMovie);
         	JSONObject jsonPelicula = ListadoActivity.getJSONArrayFromURL(DetalleActivity.url.replace("$", mRowId)).getJSONObject(0);
 			TextView content;
 			content = (TextView)findViewById(R.id.txtTitle);
@@ -47,16 +53,23 @@ public class DetalleActivity extends Activity {
 			content.setText(jsonPelicula.getString("fecha-estreno"));
 			content = (TextView)findViewById(R.id.txtRunningTime);
 			content.setText(jsonPelicula.getString("duracion"));
-			
+			/*
 			Bitmap bmp = ListadoActivity.getBitmapFromUrl(strImgUrl);
 			
 		    if (null != bmp)
 		        iv.setImageBitmap(bmp);
 		    else
 				Toast.makeText(getApplicationContext(), "Error de imagen!", Toast.LENGTH_SHORT);
-    	    
+    	    */
 		}catch(Exception e){
 			Toast.makeText(getApplicationContext(), "Error!", Toast.LENGTH_SHORT);
+		}
+	}
+	
+	private class DetalleTask extends AsyncTask<Void, Void, Void>{
+		protected Void doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 }
