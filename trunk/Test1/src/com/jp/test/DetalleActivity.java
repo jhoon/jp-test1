@@ -31,7 +31,7 @@ public class DetalleActivity extends Activity {
         try{
         	ImageView iv = (ImageView)findViewById(R.id.imgPelicula);
         	
-        	JSONObject jsonPelicula = ListadoActivity.connect(DetalleActivity.url.replace("$", mRowId)).getJSONObject(0);
+        	JSONObject jsonPelicula = ListadoActivity.getJSONArrayFromURL(DetalleActivity.url.replace("$", mRowId)).getJSONObject(0);
 			TextView content;
 			content = (TextView)findViewById(R.id.txtTitle);
 			content.setText(strPelicula);

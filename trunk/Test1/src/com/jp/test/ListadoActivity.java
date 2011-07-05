@@ -17,17 +17,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class ListadoActivity extends Activity {
@@ -42,14 +43,13 @@ public class ListadoActivity extends Activity {
 	String[] movieId;
 	String[] movieIcon;
 	JSONArray movies;
-	TextView txtErrorMsg;
+	LinearLayout layLoading;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		new PopulateGUITask().execute();
-		
 	}
 
 	private static String convertStreamToString(InputStream is) {
@@ -72,7 +72,7 @@ public class ListadoActivity extends Activity {
 		return sb.toString();
 	}
 
-	protected static JSONArray connect(String url) {
+	protected static JSONArray getJSONArrayFromURL(String url) {
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpGet httpget = new HttpGet(url);
 		HttpResponse response;
@@ -104,18 +104,18 @@ public class ListadoActivity extends Activity {
 	// AsyncTask <Params, Progress, Result>
 	private class PopulateGUITask extends AsyncTask<Void, Void, Void> {
 		protected Void doInBackground(Void... unused){
-			movies = connect(ListadoActivity.url);
+			movies = getJSONArrayFromURL(ListadoActivity.url);
 			return null;
 		}
-	
+		
 		protected void onPreExecute(){
-			txtErrorMsg = (TextView)findViewById(R.id.txtErrMsg);
-			txtErrorMsg.setText("Cargando...");
+			layLoading = (LinearLayout)findViewById(R.id.layLoading);
 		}
 		
 		protected void onPostExecute(Void unused) {
+			layLoading.setVisibility(View.GONE);
+			findViewById(R.id.list_movies).setVisibility(View.VISIBLE);
 			if(movies!=null){
-				txtErrorMsg.setHeight(0);
 				try {
 					// "Found: " + movies.length() + " movies";
 					movieList = new String[movies.length()];
@@ -138,8 +138,7 @@ public class ListadoActivity extends Activity {
 				lv.setOnItemClickListener(new OnItemClickListener() {
 					public void onItemClick(AdapterView<?> parent, View view,
 							int position, long id) {
-						Intent myIntent = new Intent(ListadoActivity.this,
-								DetalleActivity.class);
+						Intent myIntent = new Intent(ListadoActivity.this,DetalleActivity.class);
 						myIntent.putExtra(ListadoActivity.KEY_ROWID, movieId[position]);
 						myIntent.putExtra(ListadoActivity.KEY_TITLE,movieList[position]);
 						myIntent.putExtra(ListadoActivity.KEY_ICON, movieIcon[position]);
@@ -148,7 +147,7 @@ public class ListadoActivity extends Activity {
 					}
 				});	
 			} else {
-				txtErrorMsg.setText("Ha ocurrido un error en la conexión");
+				Toast.makeText(null,"Ha ocurrido un error en la conexión", Toast.LENGTH_LONG);
 			}
 		}
 	}

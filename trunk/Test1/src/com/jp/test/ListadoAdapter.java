@@ -2,13 +2,16 @@ package com.jp.test;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ImageView.ScaleType;
 
 public class ListadoAdapter extends BaseAdapter {
 
@@ -46,10 +49,11 @@ public class ListadoAdapter extends BaseAdapter {
 		TextView t = (TextView) v.findViewById(R.id.txtListTitle);
 		t.setText(mTitles[position]);
 
-		ImageView imgImagen = (ImageView) v.findViewById(R.id.imgListPelicula);
-		imgImagen.setTag(mIcons[position]);
+		ImageView imgListPelicula = (ImageView) v.findViewById(R.id.imgListPelicula);
+		imgListPelicula.setTag(mIcons[position]);
+		ProgressBar prgProgress = (ProgressBar) v.findViewById(R.id.prgProgress);
 		
-		new ListadoAdapterTask().execute(imgImagen);
+		new ListadoAdapterTask().execute(imgListPelicula,prgProgress);
 		
 		//for accessibility
 		v.setContentDescription(mTitles[position]);
@@ -57,11 +61,13 @@ public class ListadoAdapter extends BaseAdapter {
 		return v;
 	}
 
-	private class ListadoAdapterTask extends AsyncTask<ImageView, Void, Bitmap>{
+	private class ListadoAdapterTask extends AsyncTask<View, Void, Bitmap>{
 		ImageView imgAid = null;
+		ProgressBar prgLoad = null;
 		
-		protected Bitmap doInBackground(ImageView... imgView){
-			this.imgAid = imgView[0];
+		protected Bitmap doInBackground(View... views){
+			this.imgAid = (ImageView)views[0];
+			this.prgLoad = (ProgressBar)views[1];
 			Bitmap image = null;
 			try {
 				image = ListadoActivity.getBitmapFromUrl((String)imgAid.getTag());
@@ -73,7 +79,10 @@ public class ListadoAdapter extends BaseAdapter {
 		
 		protected void onPostExecute(Bitmap image){
 			if(image != null){
+				imgAid.setScaleType(ScaleType.FIT_CENTER);
 				imgAid.setImageBitmap(image);
+				prgLoad.setVisibility(View.GONE);
+				imgAid.setVisibility(View.VISIBLE);
 			}
 		}
 		
