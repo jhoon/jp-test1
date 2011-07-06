@@ -34,9 +34,7 @@ public class DetalleActivity extends Activity {
         
         
         try{
-        	new DetalleTask().execute();
-        	ImageView iv = (ImageView)findViewById(R.id.imgPelicula);
-        	iv.setImageBitmap(bmpMovie);
+        	new DetalleTask().execute(strImgUrl);
         	JSONObject jsonPelicula = ListadoActivity.getJSONArrayFromURL(DetalleActivity.url.replace("$", mRowId)).getJSONObject(0);
 			TextView content;
 			content = (TextView)findViewById(R.id.txtTitle);
@@ -66,10 +64,29 @@ public class DetalleActivity extends Activity {
 		}
 	}
 	
-	private class DetalleTask extends AsyncTask<Void, Void, Void>{
-		protected Void doInBackground(Void... params) {
-			// TODO Auto-generated method stub
-			return null;
+	private class DetalleTask extends AsyncTask<String, Void, Bitmap>{
+		ImageView iv;
+		
+		protected void onPreExecute(){
+        	iv = (ImageView)findViewById(R.id.imgPelicula);
+		}
+		
+		protected Bitmap doInBackground(String... params) {
+			Bitmap image = null;
+			try {
+				image = ListadoActivity.getBitmapFromUrl(params[0]);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return image;
+		}
+		
+		protected void onPostExecute(Bitmap image){
+			if (null != image)
+		        iv.setImageBitmap(image);
+		    else
+				Toast.makeText(getApplicationContext(), "Error de imagen!", Toast.LENGTH_SHORT);
 		}
 	}
 }

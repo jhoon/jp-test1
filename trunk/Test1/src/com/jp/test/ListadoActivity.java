@@ -23,12 +23,16 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -41,6 +45,7 @@ public class ListadoActivity extends Activity {
 	public static final String KEY_BITMAP = "bitmap";
 	private static final String url = "http://restmocker.bitzeppelin.com/api/datatest/peliculas.json";
 	
+	private PopulateGUITask myTask;
 	
 	String[] movieList;
 	String[] movieId;
@@ -52,7 +57,8 @@ public class ListadoActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		new PopulateGUITask().execute();
+		myTask = new PopulateGUITask();
+		myTask.execute();
 	}
 
 	private static String convertStreamToString(InputStream is) {
@@ -110,19 +116,36 @@ public class ListadoActivity extends Activity {
 	
 	// AsyncTask <Params, Progress, Result>
 	private class PopulateGUITask extends AsyncTask<Void, Void, Void> {
+		protected void onPreExecute(){
+			((TextView)findViewById(R.id.txtErrMsg)).setText(R.string.loading);
+			((ProgressBar)findViewById(R.id.prgMain)).setVisibility(View.VISIBLE);
+			layLoading = (LinearLayout)findViewById(R.id.layLoading);
+			layLoading.setVisibility(View.VISIBLE);
+			if(findViewById(R.id.mniStop) != null){
+				((MenuItem)findViewById(R.id.mniStop)).setEnabled(true);
+				((MenuItem)findViewById(R.id.mniRefresh)).setEnabled(false);
+			}
+		}
+		
 		protected Void doInBackground(Void... unused){
 			movies = getJSONArrayFromURL(ListadoActivity.url);
 			return null;
 		}
 		
-		protected void onPreExecute(){
-			layLoading = (LinearLayout)findViewById(R.id.layLoading);
+		protected void onCancelled(){
+			layLoading.setVisibility(View.VISIBLE);
+			((TextView)findViewById(R.id.txtErrMsg)).setText(R.string.main_stopped);
+			((ProgressBar)findViewById(R.id.prgMain)).setVisibility(View.GONE);
+			if(findViewById(R.id.mniStop) != null){
+				((MenuItem)findViewById(R.id.mniStop)).setEnabled(false);
+				((MenuItem)findViewById(R.id.mniRefresh)).setEnabled(true);
+			}
 		}
 		
 		protected void onPostExecute(Void unused) {
-			layLoading.setVisibility(View.GONE);
-			findViewById(R.id.list_movies).setVisibility(View.VISIBLE);
 			if(movies!=null){
+				layLoading.setVisibility(View.GONE);
+				findViewById(R.id.list_movies).setVisibility(View.VISIBLE);
 				try {
 					// "Found: " + movies.length() + " movies";
 					movieList = new String[movies.length()];
@@ -156,10 +179,49 @@ public class ListadoActivity extends Activity {
 //						myIntent.putExtra(ListadoActivity.KEY_BITMAP, imgListPelicula.getDrawingCache());
 						startActivity(myIntent);
 					}
-				});	
+				});
+				if(findViewById(R.id.mniStop) != null){
+					((MenuItem)findViewById(R.id.mniStop)).setEnabled(false);
+					((MenuItem)findViewById(R.id.mniRefresh)).setEnabled(true);
+				}
 			} else {
-				makeToast("Ha ocurrido un error en la conexión");
+				makeToast(getString(R.string.main_error));
 			}
 		}
+	}
+	
+	
+	/* métodos correspondientes al menú */
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.menu_main, menu);
+	    return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	    case R.id.mniRefresh:
+	        refreshList();
+	        return true;
+	    case R.id.mniStop:
+	        stopLoading();
+	        return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
+	}
+	/* ********* */
+	
+	private void refreshList(){
+		myTask = new PopulateGUITask();
+		myTask.execute();
+	}
+	
+	private void stopLoading(){
+		if (myTask != null && myTask.getStatus() == AsyncTask.Status.RUNNING) {
+			myTask.cancel(true);
+			myTask = null;
+        }
 	}
 }

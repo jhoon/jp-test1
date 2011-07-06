@@ -15,4 +15,9 @@
     <string name="description_mainlist">Lista de películas</string>
     <string name="test_title">Texto para relleno</string>
     <string name="test_text">Esto es\nrelleno\nrelleno\nrelleno\nrelleno\nrelleno\nrelleno</string>
+    <string name="refresh">Actualizar</string>
+    <string name="stop">Detener</string>
+    <string name="loading">Cargando...</string>
+    <string name="main_stopped">La operación ha sido interrumpida</string>
+    <string name="main_error">Ha ocurrido un error en la conexión</string>
 </resources>
