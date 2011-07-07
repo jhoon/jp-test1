@@ -22,14 +22,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -121,10 +118,6 @@ public class ListadoActivity extends Activity {
 			((ProgressBar)findViewById(R.id.prgMain)).setVisibility(View.VISIBLE);
 			layLoading = (LinearLayout)findViewById(R.id.layLoading);
 			layLoading.setVisibility(View.VISIBLE);
-			if(findViewById(R.id.mniStop) != null){
-				((MenuItem)findViewById(R.id.mniStop)).setEnabled(true);
-				((MenuItem)findViewById(R.id.mniRefresh)).setEnabled(false);
-			}
 		}
 		
 		protected Void doInBackground(Void... unused){
@@ -136,13 +129,10 @@ public class ListadoActivity extends Activity {
 			layLoading.setVisibility(View.VISIBLE);
 			((TextView)findViewById(R.id.txtErrMsg)).setText(R.string.main_stopped);
 			((ProgressBar)findViewById(R.id.prgMain)).setVisibility(View.GONE);
-			if(findViewById(R.id.mniStop) != null){
-				((MenuItem)findViewById(R.id.mniStop)).setEnabled(false);
-				((MenuItem)findViewById(R.id.mniRefresh)).setEnabled(true);
-			}
 		}
 		
 		protected void onPostExecute(Void unused) {
+			/// reference to menu here
 			if(movies!=null){
 				layLoading.setVisibility(View.GONE);
 				findViewById(R.id.list_movies).setVisibility(View.VISIBLE);
@@ -180,10 +170,6 @@ public class ListadoActivity extends Activity {
 						startActivity(myIntent);
 					}
 				});
-				if(findViewById(R.id.mniStop) != null){
-					((MenuItem)findViewById(R.id.mniStop)).setEnabled(false);
-					((MenuItem)findViewById(R.id.mniRefresh)).setEnabled(true);
-				}
 			} else {
 				makeToast(getString(R.string.main_error));
 			}
@@ -210,6 +196,17 @@ public class ListadoActivity extends Activity {
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
+	}
+	
+	public boolean onPrepareOptionsMenu (Menu menu){
+		if (myTask != null && myTask.getStatus() == AsyncTask.Status.RUNNING) {
+			menu.getItem(0).setEnabled(false);
+			menu.getItem(1).setEnabled(true);
+        } else {
+        	menu.getItem(0).setEnabled(true);
+			menu.getItem(1).setEnabled(false);
+        }
+		return true;
 	}
 	/* ********* */
 	
