@@ -17,11 +17,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,11 +54,30 @@ public class ListadoActivity extends Activity {
 	String[] movieIcon;
 	JSONArray movies;
 	LinearLayout layLoading;
+
+	private BroadcastReceiver brConnReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			toastMe("this is a change of connectivity!");
+			Log.v("Listado", "it's alive!");
+			boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+			if (noConnectivity){
+				Log.v("Listado", "it's alive and without connection!!");
+			} else {
+				Log.v("Listado", "it's alive and is connected!!!");
+			}
+		}
+	};
+	
+	private void toastMe(String toToast){
+		Toast.makeText(this.getApplicationContext(), toToast, Toast.LENGTH_LONG);
+	}	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		registerReceiver(brConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 		myTask = new PopulateGUITask();
 		myTask.execute();
 	}
@@ -150,6 +174,7 @@ public class ListadoActivity extends Activity {
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
+					Log.v("Listado","esta cosa se ha caido mal.");
 				}
 				
 				ListView lv = (ListView)findViewById(R.id.list_movies);
@@ -221,4 +246,6 @@ public class ListadoActivity extends Activity {
 			myTask = null;
         }
 	}
+	
+//	private class 
 }
