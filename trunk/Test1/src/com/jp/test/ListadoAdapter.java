@@ -47,15 +47,14 @@ public class ListadoAdapter extends BaseAdapter {
 		}
 		
 		TextView t = (TextView) v.findViewById(R.id.txtListTitle);
-		t.setText(mTitles[position]);
-
 		ImageView imgListPelicula = (ImageView) v.findViewById(R.id.imgListPelicula);
-		imgListPelicula.setTag(mIcons[position]);
 		ProgressBar prgProgress = (ProgressBar) v.findViewById(R.id.prgProgress);
 		
-		new ListadoAdapterTask().execute(imgListPelicula,prgProgress);
+		t.setText(mTitles[position]);
+		imgListPelicula.setTag(mIcons[position]);
 		
-		//for accessibility
+		// se ejecuta el AsyncTask para obtener los datos
+		new ListadoAdapterTask().execute(imgListPelicula,prgProgress);
 		v.setContentDescription(mTitles[position]);
 
 		return v;

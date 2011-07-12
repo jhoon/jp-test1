@@ -14,7 +14,6 @@ public class DetalleActivity extends Activity {
 	private static final String url = "http://restmocker.bitzeppelin.com/api/datatest/peliculas/$.json";
     private String mRowId;
     
-    
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.detalle);
@@ -23,16 +22,14 @@ public class DetalleActivity extends Activity {
         String strPelicula = "";
         String strImgUrl = "";
         Bundle extras = getIntent().getExtras();
-        Bitmap bmpMovie = null;
         mRowId = "";
         if (extras != null) {
             mRowId = extras.getString(ListadoActivity.KEY_ROWID);
             strPelicula = extras.getString(ListadoActivity.KEY_TITLE);
             strImgUrl = extras.getString(ListadoActivity.KEY_ICON);
-            bmpMovie = (Bitmap)extras.get(ListadoActivity.KEY_BITMAP);
         }
         
-        
+        // Se llenan todos los campos del detalle
         try{
         	new DetalleTask().execute(strImgUrl);
         	JSONObject jsonPelicula = ListadoActivity.getJSONArrayFromURL(DetalleActivity.url.replace("$", mRowId)).getJSONObject(0);
@@ -51,19 +48,14 @@ public class DetalleActivity extends Activity {
 			content.setText(jsonPelicula.getString("fecha-estreno"));
 			content = (TextView)findViewById(R.id.txtRunningTime);
 			content.setText(jsonPelicula.getString("duracion"));
-			/*
-			Bitmap bmp = ListadoActivity.getBitmapFromUrl(strImgUrl);
-			
-		    if (null != bmp)
-		        iv.setImageBitmap(bmp);
-		    else
-				Toast.makeText(getApplicationContext(), "Error de imagen!", Toast.LENGTH_SHORT);
-    	    */
 		}catch(Exception e){
 			Toast.makeText(getApplicationContext(), "Error!", Toast.LENGTH_SHORT);
 		}
 	}
 	
+	/**
+	 * se usa el DetalleTask para la imagen que debe ser cargada en el detalle
+	 */
 	private class DetalleTask extends AsyncTask<String, Void, Bitmap>{
 		ImageView iv;
 		
@@ -76,7 +68,6 @@ public class DetalleActivity extends Activity {
 			try {
 				image = ListadoActivity.getBitmapFromUrl(params[0]);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return image;
