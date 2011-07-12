@@ -2,8 +2,8 @@ package com.jp.test;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +73,7 @@ public class ListadoAdapter extends BaseAdapter {
 				image = ListadoActivity.getBitmapFromUrl((String)imgAid.getTag());
 			} catch (Exception e) {
 				e.printStackTrace();
+				Log.v("Adapter","adapter bitmap #fail!");
 			}
 			return image;
 		}
