@@ -55,10 +55,13 @@ public class ListadoActivity extends Activity {
 	JSONArray movies;
 	LinearLayout layLoading;
 
+	/**
+	 * BroadcastReceiver para monitorear cambios a la conectividad de red
+	 */
 	private BroadcastReceiver brConnReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			toastMe("this is a change of connectivity!");
+			makeToast("this is a change of connectivity!");
 			Log.v("Listado", "it's alive!");
 			boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 			if (noConnectivity){
@@ -69,10 +72,6 @@ public class ListadoActivity extends Activity {
 		}
 	};
 	
-	private void toastMe(String toToast){
-		Toast.makeText(this.getApplicationContext(), toToast, Toast.LENGTH_LONG);
-	}	
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -82,6 +81,9 @@ public class ListadoActivity extends Activity {
 		myTask.execute();
 	}
 
+	/**
+	 * convierte el contenido proveido por el InputStream a texto entendible
+	 */
 	private static String convertStreamToString(InputStream is) {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 		StringBuilder sb = new StringBuilder();
@@ -102,6 +104,9 @@ public class ListadoActivity extends Activity {
 		return sb.toString();
 	}
 
+	/** 
+	 * devuelve un JSONArray (usa convertStreamToString) 
+	 */
 	protected static JSONArray getJSONArrayFromURL(String url) {
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpGet httpget = new HttpGet(url);
@@ -124,19 +129,31 @@ public class ListadoActivity extends Activity {
 		return arResp;
 	}
 	
+	/**
+	 * devuelve un bitmap para usar en la aplicación
+	 */
 	public static Bitmap getBitmapFromUrl(String url) throws Exception{
 		URL ulrn = new URL(url);
 	    HttpURLConnection con = (HttpURLConnection)ulrn.openConnection();
 	    InputStream is = con.getInputStream();
 		return BitmapFactory.decodeStream(is);
 	}
+
 	
+	/**
+	 * método para mostrar un pequeño mensaje
+	 */
 	public void makeToast(String message){
 		Toast.makeText(this.getApplicationContext(), message, Toast.LENGTH_LONG);
 	}
 	
-	// AsyncTask <Params, Progress, Result>
+	/**
+	 * AsyncTask usado para llenar la interfaz de forma asincrónica
+	 */
 	private class PopulateGUITask extends AsyncTask<Void, Void, Void> {
+		/**
+		 * se preparan los elementos de la UI para indicar que está cargando.
+		 */
 		protected void onPreExecute(){
 			((TextView)findViewById(R.id.txtErrMsg)).setText(R.string.loading);
 			((ProgressBar)findViewById(R.id.prgMain)).setVisibility(View.VISIBLE);
@@ -144,24 +161,35 @@ public class ListadoActivity extends Activity {
 			layLoading.setVisibility(View.VISIBLE);
 		}
 		
+		/**
+		 * operación a realizar en otro hilo
+		 */
 		protected Void doInBackground(Void... unused){
 			movies = getJSONArrayFromURL(ListadoActivity.url);
 			return null;
 		}
 		
+		/**
+		 * en caso de que la operación se cancele, se llama a este método,
+		 * se ejecuta en el mismo hilo de la UI
+		 * -- aquí solo se muestra un mensaje de error
+		 */
 		protected void onCancelled(){
 			layLoading.setVisibility(View.VISIBLE);
 			((TextView)findViewById(R.id.txtErrMsg)).setText(R.string.main_stopped);
 			((ProgressBar)findViewById(R.id.prgMain)).setVisibility(View.GONE);
 		}
 		
+		/**
+		 * una vez terminado doInBackground, se ejecuta este método
+		 * se ejecuta en el mismo hilo de la UI
+		 * -- se oculta la interfaz de carga y se muestran los resultados obtenidos
+		 */
 		protected void onPostExecute(Void unused) {
-			/// reference to menu here
 			if(movies!=null){
 				layLoading.setVisibility(View.GONE);
 				findViewById(R.id.list_movies).setVisibility(View.VISIBLE);
 				try {
-					// "Found: " + movies.length() + " movies";
 					movieList = new String[movies.length()];
 					movieId = new String[movies.length()];
 					movieIcon = new String[movies.length()];
@@ -183,15 +211,10 @@ public class ListadoActivity extends Activity {
 				lv.setOnItemClickListener(new OnItemClickListener() {
 					public void onItemClick(AdapterView<?> parent, View view,
 							int position, long id) {
-//						makeToast("width: "+view.getWidth());
-//						Log.v("Listado", "width: "+view.getWidth());
-//						ImageView imgListPelicula = (ImageView)view.findViewById(R.id.imgListPelicula);
-//						Log.v("Listado", "chan!!!! : "+imgListPelicula.getId());
 						Intent myIntent = new Intent(ListadoActivity.this,DetalleActivity.class);
 						myIntent.putExtra(ListadoActivity.KEY_ROWID, movieId[position]);
 						myIntent.putExtra(ListadoActivity.KEY_TITLE,movieList[position]);
 						myIntent.putExtra(ListadoActivity.KEY_ICON, movieIcon[position]);
-//						myIntent.putExtra(ListadoActivity.KEY_BITMAP, imgListPelicula.getDrawingCache());
 						startActivity(myIntent);
 					}
 				});
@@ -246,6 +269,4 @@ public class ListadoActivity extends Activity {
 			myTask = null;
         }
 	}
-	
-//	private class 
 }
