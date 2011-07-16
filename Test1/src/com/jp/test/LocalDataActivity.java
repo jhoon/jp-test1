@@ -67,7 +67,17 @@ public class LocalDataActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 	
 	private void goToNew(){
 		Intent intent = new Intent(getApplicationContext(),LocalInsertActivity.class);
-		startActivity(intent);
+		startActivityForResult(intent, 1);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == 1){
+			if(resultCode == RESULT_OK){
+				try{ refreshList(); } catch (Exception e){}
+			}
+		}
 	}
 	
 	private void refreshList() throws SQLException{

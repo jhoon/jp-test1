@@ -22,4 +22,5 @@
     <string name="main_error">Ha ocurrido un error en la conexión</string>
     <string name="tab_activity">Obtener JSON</string>
     <string name="sql_activity">Ejemplo SQLite</string>
+    <string name="new_item">Nuevo</string>
 </resources>
