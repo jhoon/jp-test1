@@ -7,6 +7,7 @@ import com.j256.ormlite.dao.Dao;
 import com.jp.test.db.DatabaseHelper;
 import com.jp.test.db.Movies;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -44,6 +45,8 @@ public class LocalInsertActivity extends OrmLiteBaseActivity<DatabaseHelper>  {
 						finish();
 					} else {
 						dao.create(movie);
+						setResult(RESULT_OK);
+						finish();
 						//LocalDataActivity.callMe(LocalInsertActivity.this, movie.getId());
 					}
 				} catch (SQLException x){
